@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semáforo de Pedestres</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="semaforo-container">
+        <!-- Semáforo -->
+        <div class="semaforo">
+            <div class="luz vermelho" id="vermelho"></div>
+            <div class="luz amarelo" id="amarelo"></div>
+            <div class="luz verde" id="verde"></div>
+        </div>
+
+        <!-- Semáforo para pedestres -->
+        <div class="semaforo-pedestre">
+            <div class="luz vermelho ativo" id="pedestre-vermelho"></div>
+            <div class="luz verde" id="pedestre-verde"></div>
+        </div>
+
+        <!-- Botão para pedestres -->
+        <button id="botao"> Liberar Passagem</button>
+
+        <!-- Mensagem educacional abaixo do semáforo -->
+        <p class="mensagem-leis">
+            🚦 Respeite o Semáforo e as Leis de Trânsito!<br>
+            🚶Pedestres, aguardem a luz verde.<br>
+            Aperte o Botão em caso de emergência.
+        </p>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
+const vermelho = document.getElementById("vermelho");
+const amarelo = document.getElementById("amarelo");
+const verde = document.getElementById("verde");
+const pedestreVermelho = document.getElementById("pedestre-vermelho");
+const pedestreVerde = document.getElementById("pedestre-verde");
+const botao = document.getElementById("botao");
+
+let intervaloSemaforo;
+
+function acenderVermelho() {
+    vermelho.classList.add("ativo");
+    amarelo.classList.remove("ativo");
+    verde.classList.remove("ativo");
+    pedestreVermelho.classList.add("ativo");
+    pedestreVerde.classList.remove("ativo");
+}
+
+function acenderAmarelo() {
+    vermelho.classList.remove("ativo");
+    amarelo.classList.add("ativo");
+    verde.classList.remove("ativo");
+}
+
+function acenderVerde() {
+    vermelho.classList.remove("ativo");
+    amarelo.classList.remove("ativo");
+    verde.classList.add("ativo");
+    pedestreVermelho.classList.add("ativo");
+    pedestreVerde.classList.remove("ativo");
+}
+
+function pedestrePodeAtravessar() {
+    acenderVermelho();
+    pedestreVermelho.classList.remove("ativo");
+    pedestreVerde.classList.add("ativo");
+}
+
+// Função para iniciar o ciclo normal do semáforo
+function iniciarCiclo() {
+    acenderVermelho();
+    intervaloSemaforo = setTimeout(() => {
+        acenderAmarelo();
+        setTimeout(() => {
+            acenderVerde();
+            setTimeout(iniciarCiclo, 9000); // 5 segundos no verde antes de repetir o ciclo
+        }, 2000); // Amarelo dura 2 segundos
+    }, 7000); // Vermelho dura 5 segundos antes de mudar
+}
+
+// Quando o pedestre aperta o botão:
+botao.addEventListener("click", () => {
+    clearTimeout(intervaloSemaforo); // Interrompe o ciclo atual
+    botao.disabled = true;
+    
+    pedestrePodeAtravessar(); // Pedestre pode atravessar
+    
+    setTimeout(() => {
+        botao.disabled = false;
+        iniciarCiclo(); // Volta ao ciclo normal após 10 segundos
+    }, 9000);
+});
+
+// Inicia o ciclo normal ao carregar a página
+iniciarCiclo();
+
+body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: url('/spmotorista434377308468_1920.jpg') no-repeat center center fixed; /* Imagem de fundo restaurada */
+    background-size: cover;
+    font-family: Arial, sans-serif;
+}
+
+.semaforo-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+
+.semaforo, .semaforo-pedestre {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: rgb(0, 0, 0);
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+    box-shadow: 0 4px 8px rgb(196, 152, 8);
+}
+
+.luz {
+    width: 50px;
+    height: 50px;
+    margin: 10px;
+    border-radius: 50%;
+    background-color: gray;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+.vermelho.ativo {
+    background-color: red;
+}
+
+.amarelo.ativo {
+    background-color: rgb(255, 255, 0);
+}
+
+.verde.ativo {
+    background-color: rgb(0, 128, 0);
+}
+
+button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    background-color: #12491c;
+    color: rgb(255, 255, 255);
+    border-radius: 5px;
+    box-shadow: 2px 2px 5px #ffffffa1;
+    transition: 0.3s;
+}
+
+/* Estilo para a mensagem de respeito às leis de trânsito */
+.mensagem-leis {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    margin-top: 20px;
+    padding: 10px;
+    background-color: rgba(255, 255, 255, 0.8); /* Fundo semi-transparente para a mensagem */
+    border-radius: 8px;
+    max-width: 400px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
