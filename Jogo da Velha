@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jogo da Velha</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Tela de Login -->
+    <div class="login-container">
+        <h1>Bem-vindo ao Jogo da Velha!</h1>
+        <p>Jogador 1:</p>
+        <input type="text" id="nomeJogador1" placeholder="Nome do Jogador 1" />
+        <p>Jogador 2:</p>
+        <input type="text" id="nomeJogador2" placeholder="Nome do Jogador 2" />
+        <button id="iniciarJogo">Iniciar Jogo</button>
+    </div>
+
+    <!-- Jogo -->
+    <div class="game-container" style="display: none;">
+        <h1>Jogo da Velha</h1>
+        <p id="mensagem"></p>
+        <div class="tabuleiro">
+            <div class="celula" data-index="0"></div>
+            <div class="celula" data-index="1"></div>
+            <div class="celula" data-index="2"></div>
+            <div class="celula" data-index="3"></div>
+            <div class="celula" data-index="4"></div>
+            <div class="celula" data-index="5"></div>
+            <div class="celula" data-index="6"></div>
+            <div class="celula" data-index="7"></div>
+            <div class="celula" data-index="8"></div>
+        </div>
+        <button id="reiniciar">Reiniciar</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
+
+const celulas = document.querySelectorAll(".celula"); // Seleciona todas as células de um jogo (que possuem a classe .celula).
+const mensagem = document.getElementById("mensagem"); // retorna uma NodeList contendo todos os elementos com essa classe.
+const botaoReiniciar = document.getElementById("reiniciar"); // Seleciona um botão com o ID "reiniciar", usado para resetar o jogo.
+const botaoIniciar = document.getElementById("iniciarJogo"); // Seleciona um botão com o ID "iniciarJogo", usado para iniciar o jogo
+const loginContainer = document.querySelector(".login-container"); // Seleciona um elemento com a classe.login-container, que contém um formulário de login.
+const gameContainer = document.querySelector(".game-container"); // Seleciona um elemento com a classe .game-container onde o jogo acontece.
+
+let jogadorAtual = "X";
+let tabuleiro = ["", "", "", "", "", "", "", "", ""];
+let jogoAtivo = false;
+let jogador1 = "";
+let jogador2 = "";
+
+const combinacoesVitoria = [
+    [0, 1, 2], [3, 4, 5], [6, 7, 8], // Linhas
+    [0, 3, 6], [1, 4, 7], [2, 5, 8], // Colunas
+    [0, 4, 8], [2, 4, 6]  // Diagonais
+];
+
+function checarVitoria() {
+    for (let combinacao of combinacoesVitoria) {
+        const [a, b, c] = combinacao;
+        if (tabuleiro[a] && tabuleiro[a] === tabuleiro[b] && tabuleiro[a] === tabuleiro[c]) {
+            jogoAtivo = false;
+            mensagem.innerText = `🎉 O jogador  ${tabuleiro[a]} venceu!`;
+            mensagem.classList.add("vitoria"); // Adiciona a classe 'vitoria'
+            return;
+        }
+    }
+
+    if (!tabuleiro.includes("")) {
+        jogoAtivo = false;
+        mensagem.innerText = "🤝 Empate!";
+        mensagem.classList.add("empate"); // Adiciona a classe 'empate'
+    }
+}
+
+function fazerJogada(index) {
+    if (tabuleiro[index] === "" && jogoAtivo) {
+        tabuleiro[index] = jogadorAtual;
+        celulas[index].innerText = jogadorAtual;
+        checarVitoria();
+        jogadorAtual = jogadorAtual === "O" ? "X" : "O";
+    }
+}
+
+celulas.forEach((celula, index) => {
+    celula.addEventListener("click", () => fazerJogada(index));
+});
+
+botaoReiniciar.addEventListener("click", () => {
+    tabuleiro.fill("");
+    celulas.forEach(celula => celula.innerText = "");
+    jogadorAtual = "X";
+    jogoAtivo = true;
+    mensagem.innerText = "";
+});
+
+botaoIniciar.addEventListener("click", () => {
+    jogador1 = document.getElementById("nomeJogador1").value;
+    jogador2 = document.getElementById("nomeJogador2").value;
+
+    if (jogador1 && jogador2) {
+        loginContainer.style.display = "none";
+        gameContainer.style.display = "block";
+        mensagem.innerText = `${jogador1} começa!`;
+        jogoAtivo = true;
+    } else {
+        alert("Por favor, insira os nomes de ambos os jogadores!"); // quando não inserido os nomes dos players exibe uma mensagem pedindo os nomes dos players. 
+    }
+});
